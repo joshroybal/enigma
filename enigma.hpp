@@ -16,6 +16,9 @@ static const std::string ROTOR_V = "VZBRGITYUPSDNHLXAWMJQOFECK";
 static const std::string UKW_A = "EJMZALYXVBWFCRQUONTSPIKHGD";
 static const std::string UKW_B = "YRUHQSLDPXNGOKMIEBFZCWVJAT";
 static const std::string UKW_C = "FVPJIAOYEDRZXWGCTKUQSBNMHL";
+// flags
+static const bool forward = false;
+static const bool backward = true;
 
 // function prototype
 int findIndex(char ch, const std::string&);
@@ -27,7 +30,7 @@ class Rotor {
       Rotor(const std::string& MAP, int pos, int idx) : map_(MAP), offset(pos),
          rngidx(idx) { initialize(MAP); }
       void rotate();
-      int cipher(int, const std::string&);
+      int cipher(int, const bool);
    private:
       int offset;
       int turnidx;
@@ -60,7 +63,8 @@ class Enigma {
       Enigma(const std::string& rtr1, const std::string& rtr2,
          const std::string& rtr3, const std::string& refl,
          const std::string swaps, int x, int y, int z, int a, int b, int c)
-         : left(rtr1, x, a), middle(rtr2, y, b), right(rtr3, z, c), ukw(refl), stekker(swaps) { }
+         : left(rtr1, x, a), middle(rtr2, y, b), right(rtr3, z, c), ukw(refl), 
+         stekker(swaps) { }
       int cipher(int);
    private:
       Rotor left;

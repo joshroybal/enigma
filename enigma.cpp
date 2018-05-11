@@ -20,7 +20,7 @@ void Rotor::rotate()
 }
 
 // character mapping method
-int Rotor::cipher(int idx, const std::string& direction)
+int Rotor::cipher(int idx, const bool flag)
 {
    // adjust input by ring setting
    idx -= rngidx;
@@ -31,9 +31,9 @@ int Rotor::cipher(int idx, const std::string& direction)
 
    if (idx < 0)
       idx += C;
-   if (direction == "forward")
+   if (!flag)
       idx = (idx + scrambler[idx]) % C;
-   if (direction == "backward")
+   else
       idx = (idx + inverse[idx]) % C;
    if (idx < 0)
       idx += C;
@@ -43,7 +43,7 @@ int Rotor::cipher(int idx, const std::string& direction)
    if (idx < 0)
       idx += C;
 
-   idx = (idx + rngidx) % C;  // adjust output ring setting
+   idx = (idx + rngidx) % C;  // adjust output by ring setting
 
    return idx;
 }
@@ -102,7 +102,6 @@ int Reflector::cipher(int idx)
 // Plugboard class public methods
 int Plugboard::cipher(int idx)
 {
-   // return stekker_[int(ch)-65];
    return (stekker_[idx] - 65);
 }
 
@@ -113,22 +112,22 @@ int Plugboard::cipher(int idx)
 int Enigma::cipher(int idx)
 {
    // rotor stepping chores
-   if (middle.offset == middle.turnidx) {
+   right.rotate();
+   if (right.offset == (right.turnidx+1)%C)
+      middle.rotate();
+   if (right.offset == (right.turnidx+2)%C && middle.offset == middle.turnidx) {
       middle.rotate();
       left.rotate();
    }
-   if (right.offset == right.turnidx)
-      middle.rotate();
-   right.rotate();
    // encode input
    idx = stekker.cipher(idx);
-   idx = right.cipher(idx, "forward");
-   idx = middle.cipher(idx, "forward");
-   idx = left.cipher(idx, "forward");
+   idx = right.cipher(idx, forward);
+   idx = middle.cipher(idx, forward);
+   idx = left.cipher(idx, forward);
    idx = ukw.cipher(idx);
-   idx = left.cipher(idx, "backward");
-   idx = middle.cipher(idx, "backward");
-   idx = right.cipher(idx, "backward");
+   idx = left.cipher(idx, backward);
+   idx = middle.cipher(idx, backward);
+   idx = right.cipher(idx, backward);
    idx = stekker.cipher(idx);
    return idx;
 }
